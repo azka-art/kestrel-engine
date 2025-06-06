@@ -1,0 +1,166 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '6.0.4'
+    id 'io.qameta.allure' version '2.11.2'
+}
+
+group = 'com.kestrel'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    cucumberVersion = '7.15.0'
+    seleniumVersion = '4.16.1'
+    restAssuredVersion = '5.4.0'
+    junitVersion = '5.10.1'
+    allureVersion = '2.24.0'
+}
+
+dependencies {
+    // BDD Framework
+    testImplementation "io.cucumber:cucumber-java:$cucumberVersion"
+    testImplementation "io.cucumber:cucumber-junit-platform-engine:$cucumberVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testImplementation "org.junit.platform:junit-platform-suite:1.10.1"
+    
+    // Web UI Testing
+    testImplementation "org.seleniumhq.selenium:selenium-java:$seleniumVersion"
+    testImplementation 'io.github.bonigarcia:webdrivermanager:5.6.2'
+    
+    // API Testing
+    testImplementation "io.rest-assured:rest-assured:$restAssuredVersion"
+    testImplementation "io.rest-assured:json-schema-validator:$restAssuredVersion"
+    
+    // Reporting
+    testImplementation "io.qameta.allure:allure-cucumber7-jvm:$allureVersion"
+    
+    // Utilities
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.9'
+}
+
+test {
+    useJUnitPlatform()
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    systemProperties = System.properties
+    
+    // Configure test output
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+task apiTests(type: Test) {
+    description = 'Run API tests with @api tag'
+    group = 'kestrel'
+    useJUnitPlatform {
+        includeTags 'api'
+    }
+    systemProperty 'cucumber.filter.tags', '@api'
+    maxParallelForks = 4
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+task webTests(type: Test) {
+    description = 'Run Web UI tests with @web tag'
+    group = 'kestrel'
+    useJUnitPlatform {
+        includeTags 'web'
+    }
+    systemProperty 'cucumber.filter.tags', '@web'
+    maxParallelForks = 2
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+task allTests(type: Test) {
+    description = 'Run all Kestrel Engine tests'
+    group = 'kestrel'
+    useJUnitPlatform {
+        includeTags 'api | web'
+    }
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+allure {
+    report {
+        version = allureVersion
+    }
+    adapter {
+        aspectjWeaver = true
+        frameworks {
+            cucumber7jvm {
+                adapterVersion = allureVersion
+            }
+        }
+    }
+}
+
+// Fix encoding issues
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+checkstyle {
+    toolVersion = '10.12.4'
+    configFile = file('config/checkstyle/checkstyle.xml')
+}
+
+spotbugs {
+    toolVersion = '4.8.2'
+    excludeFilter = file('config/spotbugs/exclude.xml')
+}
+
+// Custom task untuk display Kestrel info
+task kestrelInfo {
+    description = 'Display Kestrel Engine information'
+    group = 'kestrel'
+    doLast {
+        println """
+🦅 ================================
+   KESTREL ENGINE v${version}
+   Hunting Bugs with Surgical Precision
+================================
+
+Available Tasks:
+• ./gradlew apiTests    - Run API hunting scenarios
+• ./gradlew webTests    - Run Web UI hunting scenarios  
+• ./gradlew allTests    - Run complete hunting mission
+• ./gradlew test        - Run all tests (JUnit default)
+
+Tech Stack:
+• Java ${System.getProperty('java.version')}
+• Cucumber ${cucumberVersion}
+• Selenium ${seleniumVersion}
+• Rest Assured ${restAssuredVersion}
+• JUnit ${junitVersion}
+
+🎯 Ready for the hunt!
+"""
+    }
+}

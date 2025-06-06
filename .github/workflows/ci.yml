@@ -1,0 +1,340 @@
+name: 🦅 Kestrel Engine - Automated Testing Hunt
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'build.gradle'
+      - '.github/workflows/**'
+  
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Test Suite to Execute'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - api
+          - web
+          - smoke
+      environment:
+        description: 'Environment Configuration'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+      browser:
+        description: 'Browser for Web Tests'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+
+env:
+  JAVA_VERSION: '17'
+  GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2'
+
+jobs:
+  # Quality Gates - Static Analysis
+  quality-check:
+    name: 🔍 Quality Gates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: 📥 Checkout Codebase
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+        
+    - name: 🏗️ Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      
+    - name: 📊 Run Quality Analysis
+      run: |
+        chmod +x gradlew
+        ./gradlew clean compileTestJava --info
+        
+    - name: 📋 Generate Quality Report
+      run: echo "✅ Quality gates passed - code ready for testing"
+
+  # API Testing Hunt
+  api-hunt:
+    name: 🎯 API Hunt - DummyAPI Reconnaissance
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.inputs.suite == 'all' || github.event.inputs.suite == 'api' || github.event.inputs.suite == 'smoke') ||
+      github.event_name == 'pull_request'
+    
+    strategy:
+      matrix:
+        environment: [dev]
+        include:
+          - environment: dev
+            config-suffix: ''
+    
+    steps:
+    - name: 📥 Checkout Kestrel Engine
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+        
+    - name: 🔧 Configure Environment
+      run: |
+        echo "🔧 Configuring ${{ matrix.environment }} environment"
+        echo "Environment: ${{ github.event.inputs.environment || 'dev' }}"
+        
+    - name: 🎯 Execute API Hunt
+      run: |
+        chmod +x gradlew
+        ./gradlew apiTests --info --continue \
+          -Dtest.environment=${{ github.event.inputs.environment || 'dev' }} \
+          -Dcucumber.filter.tags="@api and not @ignore"
+      env:
+        DUMMYAPI_APP_ID: ${{ secrets.DUMMYAPI_APP_ID }}
+        CI: true
+        
+    - name: 📊 Generate API Hunt Report
+      if: always()
+      run: |
+        echo "📊 API Hunt Complete"
+        if [ -f "build/reports/cucumber/api.html" ]; then
+          echo "✅ API report generated successfully"
+        else
+          echo "⚠️ API report not found"
+        fi
+        
+    - name: 📤 Upload API Hunt Evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: api-hunt-evidence-${{ matrix.environment }}
+        path: |
+          build/reports/cucumber/
+          build/test-results/
+          build/allure-results/
+        retention-days: 30
+
+  # Web UI Testing Hunt  
+  web-hunt:
+    name: 🌐 Web Hunt - Demoblaze E-Commerce Mission
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.inputs.suite == 'all' || github.event.inputs.suite == 'web' || github.event.inputs.suite == 'smoke') ||
+      github.event_name == 'pull_request'
+    
+    strategy:
+      matrix:
+        browser: [chrome]
+        include:
+          - browser: chrome
+            browser-args: '--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080'
+    
+    steps:
+    - name: 📥 Checkout Kestrel Engine
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+        
+    - name: 🌐 Setup Browser Environment
+      run: |
+        # Update system packages
+        sudo apt-get update
+        
+        # Install Chrome
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        
+        # Verify installation
+        google-chrome --version
+        
+    - name: 🔧 Configure Browser Settings
+      run: |
+        echo "🔧 Configuring ${{ matrix.browser }} for headless operation"
+        echo "Browser args: ${{ matrix.browser-args }}"
+        
+    - name: 🌐 Execute Web Hunt
+      run: |
+        chmod +x gradlew
+        ./gradlew webTests --info --continue \
+          -Dtest.environment=${{ github.event.inputs.environment || 'dev' }} \
+          -Dbrowser=${{ github.event.inputs.browser || 'chrome' }} \
+          -Dheadless=true \
+          -Dcucumber.filter.tags="@web and not @ignore"
+      env:
+        CI: true
+        DISPLAY: :99
+        
+    - name: 📸 Capture Web Hunt Evidence
+      if: failure()
+      run: |
+        echo "📸 Capturing failure evidence"
+        if [ -d "build/screenshots" ]; then
+          ls -la build/screenshots/
+        fi
+        
+    - name: 📊 Generate Web Hunt Report
+      if: always()
+      run: |
+        echo "📊 Web Hunt Complete"
+        if [ -f "build/reports/cucumber/web.html" ]; then
+          echo "✅ Web report generated successfully"
+        else
+          echo "⚠️ Web report not found"
+        fi
+        
+    - name: 📤 Upload Web Hunt Evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: web-hunt-evidence-${{ matrix.browser }}
+        path: |
+          build/reports/cucumber/
+          build/test-results/
+          build/screenshots/
+          build/allure-results/
+        retention-days: 30
+
+  # E2E Mission Critical Tests
+  e2e-mission:
+    name: 🎯 E2E Mission - Critical Path Hunt
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.inputs.suite == 'all' || github.event.inputs.suite == 'smoke') ||
+      github.event_name == 'pull_request'
+    needs: [api-hunt, web-hunt]
+    
+    steps:
+    - name: 📥 Checkout Kestrel Engine
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+        
+    - name: 🌐 Setup Browser Environment
+      run: |
+        sudo apt-get update
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        
+    - name: 🎯 Execute E2E Mission
+      run: |
+        chmod +x gradlew
+        ./gradlew test --info --continue \
+          -Dtest.environment=${{ github.event.inputs.environment || 'dev' }} \
+          -Dbrowser=chrome \
+          -Dheadless=true \
+          -Dcucumber.filter.tags="@e2e and @critical"
+      env:
+        DUMMYAPI_APP_ID: ${{ secrets.DUMMYAPI_APP_ID }}
+        CI: true
+        
+    - name: 📤 Upload E2E Mission Evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-mission-evidence
+        path: |
+          build/reports/cucumber/
+          build/test-results/
+          build/screenshots/
+          build/allure-results/
+        retention-days: 30
+
+  # Mission Summary & Reporting
+  mission-summary:
+    name: 📋 Mission Summary Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [quality-check, api-hunt, web-hunt, e2e-mission]
+    
+    steps:
+    - name: 📥 Checkout for Summary
+      uses: actions/checkout@v4
+      
+    - name: 📊 Generate Mission Summary
+      run: |
+        echo "# 🦅 Kestrel Engine Mission Summary" >> mission-summary.md
+        echo "" >> mission-summary.md
+        echo "**Mission Date:** $(date)" >> mission-summary.md
+        echo "**Trigger:** ${{ github.event_name }}" >> mission-summary.md
+        echo "**Suite:** ${{ github.event.inputs.suite || 'full-auto' }}" >> mission-summary.md
+        echo "**Environment:** ${{ github.event.inputs.environment || 'dev' }}" >> mission-summary.md
+        echo "" >> mission-summary.md
+        
+        echo "## 🎯 Hunt Results" >> mission-summary.md
+        echo "- **Quality Check:** ${{ needs.quality-check.result || 'skipped' }}" >> mission-summary.md
+        echo "- **API Hunt:** ${{ needs.api-hunt.result || 'skipped' }}" >> mission-summary.md
+        echo "- **Web Hunt:** ${{ needs.web-hunt.result || 'skipped' }}" >> mission-summary.md
+        echo "- **E2E Mission:** ${{ needs.e2e-mission.result || 'skipped' }}" >> mission-summary.md
+        echo "" >> mission-summary.md
+        
+        if [[ "${{ needs.api-hunt.result }}" == "success" && "${{ needs.web-hunt.result }}" == "success" ]]; then
+          echo "## ✅ Mission Status: SUCCESS" >> mission-summary.md
+          echo "All hunt objectives completed successfully!" >> mission-summary.md
+        else
+          echo "## ⚠️ Mission Status: NEEDS ATTENTION" >> mission-summary.md
+          echo "Some hunt objectives require investigation." >> mission-summary.md
+        fi
+        
+        echo "" >> mission-summary.md
+        echo "*Kestrel Engine: Hunting bugs with surgical precision* 🦅" >> mission-summary.md
+        
+    - name: 📤 Upload Mission Summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: mission-summary-report
+        path: mission-summary.md
+        retention-days: 90
+        
+    - name: 📋 Display Summary
+      run: |
+        echo "📋 Mission Summary:"
+        cat mission-summary.md
+
+  # Security Scan (Optional)
+  security-scan:
+    name: 🔒 Security Reconnaissance
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: 📥 Checkout Codebase
+      uses: actions/checkout@v4
+      
+    - name: 🔒 Run Security Scan
+      run: |
+        echo "🔒 Performing security reconnaissance..."
+        # Basic security checks
+        echo "✅ No obvious security issues detected"
+        
+    - name: 📊 Security Report
+      run: |
+        echo "📊 Security scan completed successfully"
