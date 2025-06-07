@@ -72,7 +72,7 @@ jobs:
 
   # API Testing Hunt
   api-hunt:
-    name: 🎯 API Hunt - DummyAPI Reconnaissance
+    name: 🎯 API Hunt - JSONPlaceholder Reconnaissance
     runs-on: ubuntu-latest
     if: |
       (github.event.inputs.suite == 'all' || github.event.inputs.suite == 'api' || github.event.inputs.suite == 'smoke') ||
@@ -99,6 +99,7 @@ jobs:
       run: |
         echo "🔧 Configuring ${{ matrix.environment }} environment"
         echo "Environment: ${{ github.event.inputs.environment || 'dev' }}"
+        echo "API Target: JSONPlaceholder (no authentication required)"
         
     - name: 🎯 Execute API Hunt
       run: |
@@ -107,8 +108,8 @@ jobs:
           -Dtest.environment=${{ github.event.inputs.environment || 'dev' }} \
           -Dcucumber.filter.tags="@api and not @ignore"
       env:
-        DUMMYAPI_APP_ID: ${{ secrets.DUMMYAPI_APP_ID }}
         CI: true
+        # REMOVED: DUMMYAPI_APP_ID - not needed for JSONPlaceholder
         
     - name: 📊 Generate API Hunt Report
       if: always()
@@ -253,8 +254,8 @@ jobs:
           -Dheadless=true \
           -Dcucumber.filter.tags="@e2e and @critical"
       env:
-        DUMMYAPI_APP_ID: ${{ secrets.DUMMYAPI_APP_ID }}
         CI: true
+        # REMOVED: DUMMYAPI_APP_ID - not needed for JSONPlaceholder
         
     - name: 📤 Upload E2E Mission Evidence
       uses: actions/upload-artifact@v4
@@ -287,6 +288,7 @@ jobs:
         echo "**Trigger:** ${{ github.event_name }}" >> mission-summary.md
         echo "**Suite:** ${{ github.event.inputs.suite || 'full-auto' }}" >> mission-summary.md
         echo "**Environment:** ${{ github.event.inputs.environment || 'dev' }}" >> mission-summary.md
+        echo "**API Target:** JSONPlaceholder (No Authentication Required)" >> mission-summary.md
         echo "" >> mission-summary.md
         
         echo "## 🎯 Hunt Results" >> mission-summary.md
@@ -306,6 +308,7 @@ jobs:
         
         echo "" >> mission-summary.md
         echo "*Kestrel Engine: Hunting bugs with surgical precision* 🦅" >> mission-summary.md
+        echo "*API Testing powered by JSONPlaceholder - No authentication barriers!*" >> mission-summary.md
         
     - name: 📤 Upload Mission Summary
       uses: actions/upload-artifact@v4

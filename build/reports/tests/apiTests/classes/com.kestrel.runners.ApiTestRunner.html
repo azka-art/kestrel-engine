@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class com.kestrel.runners.ApiTestRunner</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class com.kestrel.runners.ApiTestRunner</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.kestrel.runners.html">com.kestrel.runners</a> &gt; ApiTestRunner</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">4</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">22.448s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+<li>
+<a href="#tab2">Standard error</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">Get all posts</td>
+<td class="success">5.538s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Get all users</td>
+<td class="success">5.531s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Get specific post</td>
+<td class="success">5.531s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Get specific user</td>
+<td class="success">5.848s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>? Kestrel Engine loaded: dev environment
+? Config source: FILE SYSTEM (config/dev.properties)
+? Basic configuration validation passed
+   API URL: https://jsonplaceholder.typicode.com
+   Base URL: https://www.demoblaze.com
+
+? ================================
+   KESTREL ENGINE CONFIGURATION
+================================
+Environment: dev
+Base URL: https://www.demoblaze.com
+API URL: https://jsonplaceholder.typicode.com
+API Auth Required: false
+App ID: Not required (JSONPlaceholder)
+Browser: chrome
+Headless: false
+Implicit Wait: 10s
+Explicit Wait: 15s
+Page Load Timeout: 30s
+Screenshot on Failure: true
+Screenshot Path: build/screenshots
+Report Path: build/reports/cucumber
+Allure Results: build/allure-results
+================================
+
+? API authentication not required (JSONPlaceholder mode)
+? Kestrel Engine configuration validated successfully
+
+@api @smoke
+Scenario: Get specific user                          ?[90m# features/api/UserHunting.feature:12?[0m
+
+@api @smoke
+Scenario: Get all users                              ?[90m# features/api/UserHunting.feature:7?[0m
+
+@api @smoke
+Scenario: Get all posts                              ?[90m# features/api/TagHunting.feature:7?[0m
+
+@api @smoke
+Scenario: Get specific post                            ?[90m# features/api/TagHunting.feature:12?[0m
+  ?[32mGiven ?[0m?[32mKestrel API client is armed with credentials?[0m ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.kestrelApiClientIsArmedWithCredentials()?[0m
+  ?[32mGiven ?[0m?[32mKestrel API client is armed with credentials?[0m ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.kestrelApiClientIsArmedWithCredentials()?[0m
+  ?[32mGiven ?[0m?[32mKestrel API client is armed with credentials?[0m   ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.kestrelApiClientIsArmedWithCredentials()?[0m
+  ?[32mGiven ?[0m?[32mKestrel API client is armed with credentials?[0m ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.kestrelApiClientIsArmedWithCredentials()?[0m
+  ?[32mGiven ?[0m?[32ma valid tag exists in the system?[0m               ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.aValidTagExistsInTheSystem()?[0m
+  ?[32mWhen ?[0m?[32mI hunt for all available tags via GET /tag?[0m    ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.iHuntForAllAvailableTagsViaGETTag()?[0m
+  ?[32mWhen ?[0m?[32mI hunt for posts by tag via GET /post/tag/{tag}?[0m ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.iHuntForPostsByTagViaGETPostTagTag()?[0m
+  ?[32mWhen ?[0m?[32mI hunt for all users via GET /users?[0m           ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.iHuntForAllUsersViaGETUsers()?[0m
+  ?[32mThen ?[0m?[32mthe hunt should return status ?[0m?[32m?[1m200?[0m               ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.theHuntShouldReturnStatus(int)?[0m
+  ?[32mThen ?[0m?[32mthe hunt should return status ?[0m?[32m?[1m200?[0m             ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.theHuntShouldReturnStatus(int)?[0m
+  ?[32mThen ?[0m?[32mthe hunt should return status ?[0m?[32m?[1m200?[0m             ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.theHuntShouldReturnStatus(int)?[0m
+  ?[32mGiven ?[0m?[32ma valid user ID exists in the system?[0m         ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.aValidUserIdExistsInTheSystem()?[0m
+  ?[32mWhen ?[0m?[32mI hunt for user details via GET /users/{id}?[0m   ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.iHuntForUserDetailsViaGETUsersId()?[0m
+  ?[32mThen ?[0m?[32mthe hunt should return status ?[0m?[32m?[1m200?[0m             ?[90m# com.kestrel.api.stepdefs.ApiStepDefinitions.theHuntShouldReturnStatus(int)?[0m
+</pre>
+</span>
+</div>
+<div id="tab2" class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? ================================
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks -    KESTREL ENGINE HUNT BEGINS
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ================================
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? Kestrel Engine global setup complete
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? Kestrel API Hunt Starting: Get specific user [Thread: ForkJoinPool-1-worker-1]
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? API hunt target: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel API Client initialization for JSONPlaceholder...
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.clients.ApiClient - ? Kestrel API Client armed for: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.clients.ApiClient - ? Using JSONPlaceholder - No authentication required
+[ForkJoinPool-1-worker-3] INFO com.kestrel.utils.Hooks - ? Kestrel API Hunt Starting: Get all users [Thread: ForkJoinPool-1-worker-3]
+[ForkJoinPool-1-worker-3] INFO com.kestrel.utils.Hooks - ? API hunt target: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel API Client initialization for JSONPlaceholder...
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.clients.ApiClient - ? Kestrel API Client armed for: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.clients.ApiClient - ? Using JSONPlaceholder - No authentication required
+[ForkJoinPool-1-worker-4] INFO com.kestrel.utils.Hooks - ? Kestrel API Hunt Starting: Get all posts [Thread: ForkJoinPool-1-worker-4]
+[ForkJoinPool-1-worker-4] INFO com.kestrel.utils.Hooks - ? API hunt target: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel API Client initialization for JSONPlaceholder...
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.clients.ApiClient - ? Kestrel API Client armed for: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.clients.ApiClient - ? Using JSONPlaceholder - No authentication required
+[ForkJoinPool-1-worker-2] INFO com.kestrel.utils.Hooks - ? Kestrel API Hunt Starting: Get specific post [Thread: ForkJoinPool-1-worker-2]
+[ForkJoinPool-1-worker-2] INFO com.kestrel.utils.Hooks - ? API hunt target: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel API Client initialization for JSONPlaceholder...
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.clients.ApiClient - ? Kestrel API Client armed for: https://jsonplaceholder.typicode.com
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.clients.ApiClient - ? Using JSONPlaceholder - No authentication required
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel armed and ready for JSONPlaceholder hunt
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel armed and ready for JSONPlaceholder hunt
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel armed and ready for JSONPlaceholder hunt
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Kestrel armed and ready for JSONPlaceholder hunt
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Executing posts reconnaissance mission (JSONPlaceholder)
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.clients.ApiClient - ? GET Hunt: /posts (all posts)
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Executing user reconnaissance mission
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.clients.ApiClient - ? GET Hunt: /users (all users)
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Using post ID for tag-like testing
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Target acquired: Post ID 1
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Identifying valid user ID for targeted hunt
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.clients.ApiClient - ? GET Hunt: /users (all users)
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Hunting post by ID: 1
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.clients.ApiClient - ? GET Hunt: /posts/1
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? User Reconnaissance Results:
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Post Hunt Results:
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Status: 200 (HTTP/1.1 200 OK)
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Posts Reconnaissance Results:
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Response Time: 2583ms
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Status: 200 (HTTP/1.1 200 OK)
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Content Type: application/json; charset=utf-8
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Response Time: 2591ms
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Status: 200 (HTTP/1.1 200 OK)
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Response Time: 2591ms
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Content Type: application/json; charset=utf-8
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Content Type: application/json; charset=utf-8
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Body Size: 27520 characters
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Body Size: 5645 characters
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Body Size: 292 characters
+[ForkJoinPool-1-worker-2] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Hunt returned expected status: 200
+[ForkJoinPool-1-worker-4] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Hunt returned expected status: 200
+[ForkJoinPool-1-worker-3] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Hunt returned expected status: 200
+[ForkJoinPool-1-worker-2] INFO com.kestrel.utils.Hooks - ? API hunt successful: Get specific post [Thread: ForkJoinPool-1-worker-2]
+[ForkJoinPool-1-worker-3] INFO com.kestrel.utils.Hooks - ? API hunt successful: Get all users [Thread: ForkJoinPool-1-worker-3]
+[ForkJoinPool-1-worker-4] INFO com.kestrel.utils.Hooks - ? API hunt successful: Get all posts [Thread: ForkJoinPool-1-worker-4]
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Target acquired - User ID: 1
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Executing targeted user hunt for ID: 1
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.clients.ApiClient - ? GET Hunt: /users/1
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Targeted User Hunt Results:
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Status: 200 (HTTP/1.1 200 OK)
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Response Time: 138ms
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Content Type: application/json; charset=utf-8
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions -    ? Body Size: 509 characters
+[ForkJoinPool-1-worker-1] INFO com.kestrel.api.stepdefs.ApiStepDefinitions - ? Hunt returned expected status: 200
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? API hunt successful: Get specific user [Thread: ForkJoinPool-1-worker-1]
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? ================================
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks -    KESTREL ENGINE HUNT COMPLETE
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ================================
+[ForkJoinPool-1-worker-1] WARN com.kestrel.utils.DriverManager - ? Emergency driver cleanup initiated
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.DriverManager - ? Emergency cleanup completed
+[ForkJoinPool-1-worker-1] INFO com.kestrel.utils.Hooks - ? Hunt mission accomplished!
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at 7 Jun 2025 20.45.00</p>
+</div>
+</div>
+</body>
+</html>

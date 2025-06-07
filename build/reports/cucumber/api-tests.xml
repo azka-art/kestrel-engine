@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="6.867" tests="4" skipped="0" failures="0" errors="0">
+<testcase classname="User Hunt" name="Get specific user" time="5.528">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given a valid user ID exists in the system..................................passed
+When I hunt for user details via GET /users/{id}............................passed
+Then the hunt should return status 200......................................passed
+]]></system-out>
+</testcase>
+<testcase classname="User Hunt" name="Get all users" time="5.012">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for all users via GET /users....................................passed
+Then the hunt should return status 200......................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt" name="Get all posts" time="5.006">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for all available tags via GET /tag.............................passed
+Then the hunt should return status 200......................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt" name="Get specific post" time="4.739">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given a valid tag exists in the system......................................passed
+When I hunt for posts by tag via GET /post/tag/{tag}........................passed
+Then the hunt should return status 200......................................passed
+]]></system-out>
+</testcase>
+</testsuite>

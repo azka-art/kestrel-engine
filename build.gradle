@@ -37,15 +37,52 @@ dependencies {
     
     // Reporting
     testImplementation "io.qameta.allure:allure-cucumber7-jvm:$allureVersion"
+    testImplementation "io.qameta.allure:allure-junit5:$allureVersion"
+    testImplementation "io.qameta.allure:allure-rest-assured:$allureVersion"
+    testImplementation 'net.masterthought:cucumber-reporting:5.7.5'
     
     // Utilities
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
     testImplementation 'org.slf4j:slf4j-simple:2.0.9'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
+// ===== ALLURE CONFIGURATION =====
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter {
+        aspectjWeaver.set(true)
+        autoconfigure.set(true)
+        frameworks {
+            cucumber7jvm {
+                adapterVersion.set(allureVersion)
+            }
+        }
+    }
+}
+
+// ===== TEST CONFIGURATION =====
 test {
     useJUnitPlatform()
-    maxParallelForks = Runtime.runtime.availableProcessors()
+    
+    // Test execution properties
+    systemProperty 'cucumber.publish.quiet', 'true'
+    systemProperty 'cucumber.plugin', [
+        'pretty',
+        'html:build/reports/cucumber/cucumber.html',
+        'json:build/reports/cucumber/cucumber.json',
+        'junit:build/reports/cucumber/cucumber.xml',
+        'io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm'
+    ].join(',')
+    
+    // Allure properties
+    systemProperty 'allure.results.directory', 'build/allure-results'
+    
+    // Test execution settings
+    maxParallelForks = 2
+    forkEvery = 1
     systemProperties = System.properties
     
     // Configure test output
@@ -53,64 +90,116 @@ test {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+    
+    // Ensure reports directory exists
+    doFirst {
+        file('build/reports/cucumber').mkdirs()
+        file('build/allure-results').mkdirs()
+    }
+    
+    // Generate reports after test execution
+    finalizedBy 'generateCucumberReports'
 }
 
+// ===== API TESTS TASK =====
 task apiTests(type: Test) {
     description = 'Run API tests with @api tag'
     group = 'kestrel'
     useJUnitPlatform {
         includeTags 'api'
     }
+    include '**/ApiTestRunner.class'
+    
     systemProperty 'cucumber.filter.tags', '@api'
+    systemProperty 'cucumber.plugin', [
+        'pretty',
+        'html:build/reports/cucumber/api-tests.html',
+        'json:build/reports/cucumber/api-tests.json',
+        'junit:build/reports/cucumber/api-tests.xml',
+        'io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm'
+    ].join(',')
+    
+    systemProperty 'allure.results.directory', 'build/allure-results'
     maxParallelForks = 4
     
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+    
+    doFirst {
+        file('build/reports/cucumber').mkdirs()
+        file('build/allure-results').mkdirs()
+    }
+    
+    finalizedBy 'generateApiTestReports'
 }
 
+// ===== WEB TESTS TASK =====
 task webTests(type: Test) {
     description = 'Run Web UI tests with @web tag'
     group = 'kestrel'
     useJUnitPlatform {
         includeTags 'web'
     }
+    include '**/WebTestRunner.class'
+    
     systemProperty 'cucumber.filter.tags', '@web'
+    systemProperty 'cucumber.plugin', [
+        'pretty',
+        'html:build/reports/cucumber/web-tests.html',
+        'json:build/reports/cucumber/web-tests.json',
+        'junit:build/reports/cucumber/web-tests.xml',
+        'io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm'
+    ].join(',')
+    
+    systemProperty 'allure.results.directory', 'build/allure-results'
     maxParallelForks = 2
     
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+    
+    doFirst {
+        file('build/reports/cucumber').mkdirs()
+        file('build/allure-results').mkdirs()
+    }
+    
+    finalizedBy 'generateWebTestReports'
 }
 
+// ===== ALL TESTS TASK =====
 task allTests(type: Test) {
     description = 'Run all Kestrel Engine tests'
     group = 'kestrel'
     useJUnitPlatform {
         includeTags 'api | web'
     }
+    include '**/AllTestsRunner.class'
+    
+    systemProperty 'cucumber.plugin', [
+        'pretty',
+        'html:build/reports/cucumber/all-tests.html',
+        'json:build/reports/cucumber/all-tests.json',
+        'junit:build/reports/cucumber/all-tests.xml',
+        'io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm'
+    ].join(',')
+    
+    systemProperty 'allure.results.directory', 'build/allure-results'
     maxParallelForks = Runtime.runtime.availableProcessors()
     
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
-}
-
-allure {
-    report {
-        version = allureVersion
+    
+    doFirst {
+        file('build/reports/cucumber').mkdirs()
+        file('build/allure-results').mkdirs()
     }
-    adapter {
-        aspectjWeaver = true
-        frameworks {
-            cucumber7jvm {
-                adapterVersion = allureVersion
-            }
-        }
-    }
+    
+    finalizedBy 'generateAllTestReports'
 }
 
 // Fix encoding issues
@@ -136,31 +225,200 @@ spotbugs {
     excludeFilter = file('config/spotbugs/exclude.xml')
 }
 
-// Custom task untuk display Kestrel info
-task kestrelInfo {
-    description = 'Display Kestrel Engine information'
-    group = 'kestrel'
+// ===== REPORTING TASKS =====
+task generateCucumberReports {
+    group = 'reporting'
+    description = 'Generate enhanced Cucumber HTML reports'
+    
     doLast {
-        println """
-🦅 ================================
-   KESTREL ENGINE v${version}
-   Hunting Bugs with Surgical Precision
-================================
-
-Available Tasks:
-• ./gradlew apiTests    - Run API hunting scenarios
-• ./gradlew webTests    - Run Web UI hunting scenarios  
-• ./gradlew allTests    - Run complete hunting mission
-• ./gradlew test        - Run all tests (JUnit default)
-
-Tech Stack:
-• Java ${System.getProperty('java.version')}
-• Cucumber ${cucumberVersion}
-• Selenium ${seleniumVersion}
-• Rest Assured ${restAssuredVersion}
-• JUnit ${junitVersion}
-
-🎯 Ready for the hunt!
-"""
+        if (file('build/reports/cucumber/cucumber.json').exists()) {
+            println "🦅 Generating Kestrel Engine Cucumber Reports..."
+            println "✅ Basic Cucumber HTML reports generated"
+            println "📄 Location: build/reports/cucumber/cucumber.html"
+        }
     }
+}
+
+task generateApiTestReports {
+    group = 'reporting'
+    description = 'Generate API test reports'
+    
+    doLast {
+        println "🦅 API Test Reports Generated:"
+        println "📄 HTML: build/reports/cucumber/api-tests.html"
+        println "📄 JSON: build/reports/cucumber/api-tests.json"
+        println "📄 XML: build/reports/cucumber/api-tests.xml"
+    }
+}
+
+task generateWebTestReports {
+    group = 'reporting'
+    description = 'Generate Web test reports'
+    
+    doLast {
+        println "🦅 Web Test Reports Generated:"
+        println "📄 HTML: build/reports/cucumber/web-tests.html"
+        println "📄 JSON: build/reports/cucumber/web-tests.json"
+        println "📄 XML: build/reports/cucumber/web-tests.xml"
+    }
+}
+
+task generateAllTestReports {
+    group = 'reporting'
+    description = 'Generate all test reports'
+    
+    doLast {
+        println "🦅 All Test Reports Generated:"
+        println "📄 HTML: build/reports/cucumber/all-tests.html"
+        println "📄 JSON: build/reports/cucumber/all-tests.json"
+        println "📄 XML: build/reports/cucumber/all-tests.xml"
+    }
+}
+
+task generateAllureReport {
+    group = 'reporting'
+    description = 'Generate Allure HTML report'
+    dependsOn 'allureReport'
+    
+    doLast {
+        println "🦅 Allure Report Generated:"
+        println "📄 Open: build/reports/allure-report/index.html"
+        println "🌐 Or run: ./gradlew allureServe"
+    }
+}
+
+task generateAllReports {
+    group = 'reporting'
+    description = 'Generate all available test reports'
+    dependsOn 'test'
+    
+    doLast {
+        println "\n🦅 ================================="
+        println "   KESTREL ENGINE TEST REPORTS"
+        println "================================="
+        println "📊 Gradle Test Report:"
+        println "   build/reports/tests/test/index.html"
+        println ""
+        println "🥒 Cucumber Reports:"
+        println "   build/reports/cucumber/cucumber.html"
+        println "   build/reports/cucumber/api-tests.html"
+        println "   build/reports/cucumber/web-tests.html"
+        println ""
+        println "🎯 Allure Report (Enhanced):"
+        println "   Run: ./gradlew allureReport"
+        println "   Then open: build/reports/allure-report/index.html"
+        println "   Or run: ./gradlew allureServe"
+        println ""
+        println "📄 Raw Data:"
+        println "   build/reports/cucumber/*.json"
+        println "   build/allure-results/*"
+        println "================================="
+    }
+}
+
+task cleanReports {
+    group = 'reporting'
+    description = 'Clean all report directories'
+    
+    doLast {
+        delete 'build/reports'
+        delete 'build/allure-results'
+        println "🧹 All report directories cleaned"
+    }
+}
+
+// ===== REPORT VIEWER TASKS =====
+task openReports {
+    group = 'reporting'
+    description = 'Open test reports in browser'
+    
+    doLast {
+        def reportFile = file('build/reports/tests/test/index.html')
+        if (reportFile.exists()) {
+            if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+                exec { commandLine 'cmd', '/c', 'start', reportFile.absolutePath }
+            }
+            else if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+                exec { commandLine 'open', reportFile.absolutePath }
+            }
+            else {
+                exec { commandLine 'xdg-open', reportFile.absolutePath }
+            }
+            println "🌐 Opening Gradle test report in browser..."
+        } else {
+            println "❌ No test reports found. Run tests first."
+        }
+    }
+}
+
+task openCucumberReport {
+    group = 'reporting'
+    description = 'Open Cucumber HTML report in browser'
+    
+    doLast {
+        def reportFile = file('build/reports/cucumber/cucumber.html')
+        if (reportFile.exists()) {
+            if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+                exec { commandLine 'cmd', '/c', 'start', reportFile.absolutePath }
+            }
+            else if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+                exec { commandLine 'open', reportFile.absolutePath }
+            }
+            else {
+                exec { commandLine 'xdg-open', reportFile.absolutePath }
+            }
+            println "🌐 Opening Cucumber report in browser..."
+        } else {
+            println "❌ No Cucumber reports found. Run tests first."
+        }
+    }
+}
+
+// ===== UTILITY TASKS =====
+task kestrelInfo {
+    group = 'help'
+    description = 'Display Kestrel Engine information and available tasks'
+    
+    doLast {
+        println "\n🦅 ================================="
+        println "      KESTREL ENGINE v${version}"
+        println "   Hunting Bugs with Surgical Precision"
+        println "================================="
+        println ""
+        println "🎯 TEST EXECUTION:"
+        println "   ./gradlew test          # All tests"
+        println "   ./gradlew apiTests      # API tests only"
+        println "   ./gradlew webTests      # Web tests only"
+        println "   ./gradlew allTests      # Complete mission"
+        println ""
+        println "📊 REPORT GENERATION:"
+        println "   ./gradlew generateAllReports"
+        println "   ./gradlew allureReport"
+        println "   ./gradlew allureServe   # Live server"
+        println ""
+        println "🌐 VIEW REPORTS:"
+        println "   ./gradlew openReports"
+        println "   ./gradlew openCucumberReport"
+        println ""
+        println "🧹 CLEANUP:"
+        println "   ./gradlew cleanReports"
+        println "   ./gradlew clean"
+        println ""
+        println "Tech Stack:"
+        println "• Java ${System.getProperty('java.version')}"
+        println "• Cucumber ${cucumberVersion}"
+        println "• Selenium ${seleniumVersion}"
+        println "• Rest Assured ${restAssuredVersion}"
+        println "• JUnit ${junitVersion}"
+        println ""
+        println "🎯 Ready for the hunt!"
+        println "================================="
+    }
+}
+
+task simpleApiTest(type: JavaExec) {
+    group = 'kestrel'
+    description = 'Test JSONPlaceholder API connectivity'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kestrel.debug.SimpleApiTest'
 }
