@@ -1,0 +1,7 @@
+Could not start a new session. Response code 500. Message: session not created
+from unknown error: cannot find Chrome binary 
+Host info: host: 'M-DZ', ip: '192.168.1.12'
+Build info: version: '4.16.1', revision: '9b4c83354e'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [null, newSession {capabilities=[Capabilities {browserName: chrome, goog:chromeOptions: {args: [--disable-web-security, --disable-features=VizDispl..., --disable-extensions, --disable-plugins, --disable-images, --disable-javascript, --no-first-run, --disable-default-apps, --disable-popup-blocking], extensions: []}}]}]

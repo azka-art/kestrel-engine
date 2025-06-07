@@ -1,0 +1,5 @@
+postId	expectedBehavior
+1	success
+100	success
+999	not_found
+0	not_found

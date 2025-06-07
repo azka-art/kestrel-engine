@@ -1,33 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Cucumber" time="6.867" tests="4" skipped="0" failures="0" errors="0">
-<testcase classname="User Hunt" name="Get specific user" time="5.528">
-<system-out><![CDATA[
-Given Kestrel API client is armed with credentials..........................passed
-Given a valid user ID exists in the system..................................passed
-When I hunt for user details via GET /users/{id}............................passed
-Then the hunt should return status 200......................................passed
-]]></system-out>
-</testcase>
-<testcase classname="User Hunt" name="Get all users" time="5.012">
-<system-out><![CDATA[
-Given Kestrel API client is armed with credentials..........................passed
-When I hunt for all users via GET /users....................................passed
-Then the hunt should return status 200......................................passed
-]]></system-out>
-</testcase>
-<testcase classname="Posts Hunt" name="Get all posts" time="5.006">
+<testsuite name="Cucumber" time="11.404" tests="16" skipped="0" failures="2" errors="0">
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Content reconnaissance - Get all posts" time="5.559">
 <system-out><![CDATA[
 Given Kestrel API client is armed with credentials..........................passed
 When I hunt for all available tags via GET /tag.............................passed
 Then the hunt should return status 200......................................passed
+And the intelligence should contain tag collection..........................passed
+And each tag should be properly formatted...................................passed
+And tag list should not be empty............................................passed
 ]]></system-out>
 </testcase>
-<testcase classname="Posts Hunt" name="Get specific post" time="4.739">
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Unauthorized content access attempt" time="5.592">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given Kestrel API client lacks proper credentials...........................passed
+When I attempt tag reconnaissance via GET /tag..............................passed
+Then response should indicate forbidden access..............................passed
+And no tag information should be exposed....................................passed
+And security measures should be enforced....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Content reconnaissance - Get all posts" time="5.377">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for all available tags via GET /tag.............................passed
+Then the hunt should return status 200......................................passed
+And the intelligence should contain tag collection..........................passed
+And each tag should be properly formatted...................................passed
+And tag list should not be empty............................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Targeted content hunt - Get specific post" time="6.884">
 <system-out><![CDATA[
 Given Kestrel API client is armed with credentials..........................passed
 Given a valid tag exists in the system......................................passed
 When I hunt for posts by tag via GET /post/tag/{tag}........................passed
 Then the hunt should return status 200......................................passed
+And response should contain relevant posts..................................passed
+And all posts should be tagged correctly....................................passed
+And post metadata should be complete........................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Targeted content hunt - Get specific post" time="6.795">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given a valid tag exists in the system......................................passed
+When I hunt for posts by tag via GET /post/tag/{tag}........................passed
+Then the hunt should return status 200......................................passed
+And response should contain relevant posts..................................passed
+And all posts should be tagged correctly....................................passed
+And post metadata should be complete........................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Multi-tag intelligence gathering" time="7.295">
+<failure type="java.lang.ClassCastException" message="class java.util.LinkedHashMap cannot be cast to class java.util.List (java.util.LinkedHashMap and java.util.List are in module java.base of loader 'bootstrap')">
+<![CDATA[java.lang.ClassCastException: class java.util.LinkedHashMap cannot be cast to class java.util.List (java.util.LinkedHashMap and java.util.List are in module java.base of loader 'bootstrap')
+	at io.restassured.path.json.JsonPath.getList(JsonPath.java:375)
+	at com.kestrel.api.stepdefs.ApiStepDefinitions.contentRelevanceShouldBeMaintained(ApiStepDefinitions.java:974)
+	at ?.content relevance should be maintained(classpath:features/api/TagHunting.feature:37)
+]]>
+</failure>
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given multiple posts exist with different tags..............................passed
+When I hunt for posts using popular tags....................................passed
+Then each hunt should return status 200.....................................passed
+And filtered results should meet criteria...................................passed
+And content relevance should be maintained..................................failed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Multi-tag intelligence gathering" time="7.279">
+<failure type="java.lang.ClassCastException" message="class java.util.LinkedHashMap cannot be cast to class java.util.List (java.util.LinkedHashMap and java.util.List are in module java.base of loader 'bootstrap')">
+<![CDATA[java.lang.ClassCastException: class java.util.LinkedHashMap cannot be cast to class java.util.List (java.util.LinkedHashMap and java.util.List are in module java.base of loader 'bootstrap')
+	at io.restassured.path.json.JsonPath.getList(JsonPath.java:375)
+	at com.kestrel.api.stepdefs.ApiStepDefinitions.contentRelevanceShouldBeMaintained(ApiStepDefinitions.java:974)
+	at ?.content relevance should be maintained(classpath:features/api/UserHunting.feature:37)
+]]>
+</failure>
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given multiple posts exist with different tags..............................passed
+When I hunt for posts using popular tags....................................passed
+Then each hunt should return status 200.....................................passed
+And filtered results should meet criteria...................................passed
+And content relevance should be maintained..................................failed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Unauthorized content access attempt" time="4.621">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given Kestrel API client lacks proper credentials...........................passed
+When I attempt tag reconnaissance via GET /tag..............................passed
+Then response should indicate forbidden access..............................passed
+And no tag information should be exposed....................................passed
+And security measures should be enforced....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="User-specific content hunt" time="3.061">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given a valid user ID exists in the system..................................passed
+When I hunt for posts by user via GET posts endpoint........................passed
+Then the hunt should return status 200......................................passed
+And response should contain user-specific posts.............................passed
+And all posts should belong to correct user.................................passed
+And user association should be maintained...................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Edge case content testing" time="3.62">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for posts with edge case IDs....................................passed
+Then boundary conditions should be handled correctly........................passed
+And appropriate status codes should be returned.............................passed
+And error handling should be consistent.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Edge case content testing" time="3.595">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for posts with edge case IDs....................................passed
+Then boundary conditions should be handled correctly........................passed
+And appropriate status codes should be returned.............................passed
+And error handling should be consistent.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="User-specific content hunt" time="1.183">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+Given a valid user ID exists in the system..................................passed
+When I hunt for posts by user via GET posts endpoint........................passed
+Then the hunt should return status 200......................................passed
+And response should contain user-specific posts.............................passed
+And all posts should belong to correct user.................................passed
+And user association should be maintained...................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Rapid content retrieval" time="2.532">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I execute rapid successive posts retrieval.............................passed
+Then all requests should complete successfully..............................passed
+And response times should be consistent.....................................passed
+And data integrity should be maintained.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Hunt for non-existent content" time="0.983">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for posts with invalid tag "non_existent_tag_99999".............passed
+Then the hunt should return appropriate status..............................passed
+And response should handle gracefully.......................................passed
+And error message should be informative.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Rapid content retrieval" time="2.762">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I execute rapid successive posts retrieval.............................passed
+Then all requests should complete successfully..............................passed
+And response times should be consistent.....................................passed
+And data integrity should be maintained.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Posts Hunt - JSONPlaceholder Content Management" name="Hunt for non-existent content" time="0.583">
+<system-out><![CDATA[
+Given Kestrel API client is armed with credentials..........................passed
+When I hunt for posts with invalid tag "non_existent_tag_99999".............passed
+Then the hunt should return appropriate status..............................passed
+And response should handle gracefully.......................................passed
+And error message should be informative.....................................passed
 ]]></system-out>
 </testcase>
 </testsuite>
