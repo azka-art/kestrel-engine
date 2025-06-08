@@ -15,11 +15,11 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * Kestrel Engine Home Page Object
- * Demoblaze homepage interactions and navigation
+ * 🦅 Kestrel Engine Home Page Object - Enhanced for WebStepDefinitions Integration
+ * Demoblaze homepage interactions and navigation with getter methods for compilation fixes
  * 
  * @author Kestrel Engine
- * @version 1.0.0
+ * @version 2.0.0 (Enhanced with Required Getters)
  */
 public class HomePage {
     private static final Logger logger = LoggerFactory.getLogger(HomePage.class);
@@ -84,6 +84,16 @@ public class HomePage {
     // Footer Elements
     @FindBy(className = "list-unstyled")
     private WebElement footerLinks;
+    
+    // Additional elements for enhanced functionality
+    @FindBy(xpath = "//div[@class='navbar-nav']")
+    private WebElement userMenuElement;
+    
+    @FindBy(xpath = "//span[@id='cart-count']")
+    private WebElement cartCounterElement;
+    
+    @FindBy(id = "cart")
+    private WebElement cartButton;
     
     /**
      * Constructor - Initialize page elements
@@ -313,5 +323,193 @@ public class HomePage {
         String url = driver.getCurrentUrl();
         logger.debug("🔗 Current URL: {}", url);
         return url;
+    }
+    
+    // ===== REQUIRED GETTER METHODS FOR WEBSTEPDEFINITIONS INTEGRATION =====
+    
+    /**
+     * Get the welcome element for external wait operations
+     * Required by WebStepDefinitions for user authentication validation
+     * @return WebElement representing the welcome message
+     */
+    public WebElement getWelcomeElement() {
+        return welcomeMessage;
+    }
+    
+    /**
+     * Get the user menu element for external operations
+     * Required by WebStepDefinitions for menu accessibility checks
+     * @return WebElement representing the user menu
+     */
+    public WebElement getUserMenuElement() {
+        return userMenuElement;
+    }
+    
+    /**
+     * Get the login button element for external operations
+     * Required by WebStepDefinitions for visibility and clickability checks
+     * @return WebElement representing the login button
+     */
+    public WebElement getLoginButton() {
+        return loginButton;
+    }
+    
+    /**
+     * Get the logout button element for external operations
+     * Required by WebStepDefinitions for logout operations
+     * @return WebElement representing the logout button
+     */
+    public WebElement getLogoutButton() {
+        return logoutButton;
+    }
+    
+    /**
+     * Get the cart counter element for external operations
+     * Required by WebStepDefinitions for cart count validation
+     * @return WebElement representing the cart counter
+     */
+    public WebElement getCartCounterElement() {
+        return cartCounterElement;
+    }
+    
+    /**
+     * Get the cart button element for external operations
+     * Required by WebStepDefinitions for cart navigation
+     * @return WebElement representing the cart button
+     */
+    public WebElement getCartButton() {
+        return cartButton;
+    }
+    
+    /**
+     * Get category element by name for external operations
+     * Required by WebStepDefinitions for category selection
+     * @param category Category name
+     * @return WebElement representing the category
+     */
+    public WebElement getCategoryElement(String category) {
+        return switch (category.toLowerCase()) {
+            case "phones" -> phonesCategory;
+            case "laptops" -> laptopsCategory;
+            case "monitors" -> monitorsCategory;
+            default -> throw new IllegalArgumentException("Invalid category: " + category);
+        };
+    }
+    
+    /**
+     * Get product element by name for external operations
+     * Required by WebStepDefinitions for product selection
+     * @param productName Product name
+     * @return WebElement representing the product
+     */
+    public WebElement getProductElement(String productName) {
+        // Wait for products to load
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("card-title")));
+        
+        // Find the product element
+        for (WebElement productTitle : productTitles) {
+            if (productTitle.getText().trim().equalsIgnoreCase(productName.trim())) {
+                return productTitle;
+            }
+        }
+        
+        throw new RuntimeException("Product element not found: " + productName);
+    }
+    
+    /**
+     * Get navigation bar element for external operations
+     * Required by WebStepDefinitions for page validation
+     * @return WebElement representing the navigation bar
+     */
+    public WebElement getNavigationBar() {
+        return navigationBar;
+    }
+    
+    /**
+     * Get product container element for external operations
+     * Required by WebStepDefinitions for product area validation
+     * @return WebElement representing the product container
+     */
+    public WebElement getProductContainer() {
+        return productContainer;
+    }
+    
+    /**
+     * Get sign up button element for external operations
+     * Required by WebStepDefinitions for registration flow
+     * @return WebElement representing the sign up button
+     */
+    public WebElement getSignUpButton() {
+        return signUpButton;
+    }
+    
+    /**
+     * Get cart counter text for validation
+     * Required by WebStepDefinitions for cart count checks
+     * @return Cart counter text or empty string if not visible
+     */
+    public String getCartCounter() {
+        try {
+            return cartCounterElement.getText();
+        } catch (Exception e) {
+            logger.debug("Cart counter not visible or accessible");
+            return "";
+        }
+    }
+    
+    /**
+     * Get home link element for navigation validation
+     * @return WebElement representing the home link
+     */
+    public WebElement getHomeLink() {
+        return homeLink;
+    }
+    
+    /**
+     * Get contact link element for navigation validation
+     * @return WebElement representing the contact link
+     */
+    public WebElement getContactLink() {
+        return contactLink;
+    }
+    
+    /**
+     * Get about us link element for navigation validation
+     * @return WebElement representing the about us link
+     */
+    public WebElement getAboutUsLink() {
+        return aboutUsLink;
+    }
+    
+    /**
+     * Get cart link element for navigation validation
+     * @return WebElement representing the cart link
+     */
+    public WebElement getCartLink() {
+        return cartLink;
+    }
+    
+    /**
+     * Get carousel element for page validation
+     * @return WebElement representing the carousel
+     */
+    public WebElement getCarousel() {
+        return carousel;
+    }
+    
+    /**
+     * Get product titles list for external operations
+     * @return List of WebElements representing product titles
+     */
+    public List<WebElement> getProductTitles() {
+        return productTitles;
+    }
+    
+    /**
+     * Get product cards list for external operations
+     * @return List of WebElements representing product cards
+     */
+    public List<WebElement> getProductCards() {
+        return productCards;
     }
 }
